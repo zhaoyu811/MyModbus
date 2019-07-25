@@ -291,3 +291,62 @@ int Modbus::ModbusWrite(int slaveid, int reg, int val)
         }
     }
 }
+
+int Modbus::ModbusWriteRegisters(int slaveid, int reg, int num, unsigned short *data)
+{
+    unsigned char *buf = new unsigned char[num*2+9];
+
+    buf[0] = slaveid;
+    buf[1] = 0x10;
+    buf[2] = reg>>8;
+    buf[3] = reg;
+    buf[4] = num>>8;
+    buf[5] = num;
+    buf[6] = num*2;
+
+    for(int i=0; i<num; i++)
+    {
+        buf[7+(i*2)] = data[i]>>8;
+        buf[8+(i*2)] = data[i];
+    }
+
+    unsigned short ret = crc16(buf, (num*2+7));
+    buf[num*2+7] = ret>>8;
+    buf[num*2+8] = ret;
+
+    DWORD bytesWritten;
+    PurgeComm(uart, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);
+    WriteFile(uart, buf, num*2+9, &bytesWritten, NULL);
+    if(bytesWritten != (num*2+9))
+    {
+        qDebug()<<"写入错误"<<bytesWritten;
+        return -1;
+    }
+    else
+    {
+        unsigned char *retbuf = new unsigned char[8];
+        DWORD bytesRead;
+        ReadFile(uart, retbuf, 8, &bytesRead, NULL);
+        if(bytesRead != 8)
+        {
+            qDebug()<<"读到数据长度错误"<<bytesRead;
+            return -1;
+        }
+        else
+        {
+            unsigned short ret = crc16(retbuf, 8);
+
+            if(ret!=0)
+            {
+                qDebug()<<"数据校验错误";
+                return -1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        delete[] retbuf;
+    }
+    delete[] buf;
+}

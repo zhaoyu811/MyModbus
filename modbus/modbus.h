@@ -14,6 +14,7 @@ public:
     void ModbusSetSerialPort(const QString &name);
     int ModbusRead(int slaveid, int reg, int num, unsigned short *dest);
     int ModbusWrite(int slaveid, int reg, int val);
+    int ModbusWriteRegisters(int slaveid, int reg, int num, unsigned short *data);
 private:
     HANDLE uart = NULL;
 };

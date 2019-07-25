@@ -41,18 +41,45 @@ void MainWindow::on_pB_Send_W_clicked()
     modbus = new Modbus();
     modbus->ModbusSetSerialPort(s->serial.name);
 
-    if(modbus->ModbusWrite(ui->lE_Slave_W->text().toInt(), ui->lE_Registor_W->text().toInt(), ui->lE_Data_W->text().toInt())==0)
+    QStringList dataList;
+    dataList = ui->lE_Data_W->text().split(" ");
+    unsigned short *data = new unsigned short[dataList.length()];
+
+    for(int i=0; i<dataList.length(); i++)
     {
-        qint64 end = QDateTime::currentDateTime().toMSecsSinceEpoch();
-        QMessageBox::information(this, tr("写入成功"), tr("写入成功,耗时%1ms").arg(end-start));
-        qDebug()<<"写入成功";
+        data[i] = dataList.at(i).toUShort();
     }
-    else
+    if(dataList.length()==1)
     {
-        qint64 end = QDateTime::currentDateTime().toMSecsSinceEpoch();
-        QMessageBox::information(this, tr("写入失败"), tr("写入失败,耗时%1ms").arg(end-start));
-        qDebug()<<"写入失败";
+        if(modbus->ModbusWrite(ui->lE_Slave_W->text().toInt(), ui->lE_Registor_W->text().toInt(), ui->lE_Data_W->text().toInt())==0)
+        {
+            qint64 end = QDateTime::currentDateTime().toMSecsSinceEpoch();
+            QMessageBox::information(this, tr("写入成功"), tr("写入成功,耗时%1ms").arg(end-start));
+            qDebug()<<"写入成功";
+        }
+        else
+        {
+            qint64 end = QDateTime::currentDateTime().toMSecsSinceEpoch();
+            QMessageBox::information(this, tr("写入失败"), tr("写入失败,耗时%1ms").arg(end-start));
+            qDebug()<<"写入失败";
+        }
     }
+    else if(dataList.length()>1)
+    {
+        if(modbus->ModbusWriteRegisters(ui->lE_Slave_W->text().toInt(), ui->lE_Registor_W->text().toInt(), dataList.length(), data)==0)
+        {
+            qint64 end = QDateTime::currentDateTime().toMSecsSinceEpoch();
+            QMessageBox::information(this, tr("写入成功"), tr("写入成功,耗时%1ms").arg(end-start));
+            qDebug()<<"写入成功";
+        }
+        else
+        {
+            qint64 end = QDateTime::currentDateTime().toMSecsSinceEpoch();
+            QMessageBox::information(this, tr("写入失败"), tr("写入失败,耗时%1ms").arg(end-start));
+            qDebug()<<"写入失败";
+        }
+    }
+    delete []data;
     delete modbus;
 }
 
