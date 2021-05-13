@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QDateTime>
+#include <QProcess>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,6 +33,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::SettingsUI_Show(void)
 {
+    s->UpdateSerialPort();
     s->show();
 }
 
@@ -39,7 +41,7 @@ void MainWindow::on_pB_Send_W_clicked()
 {
     qint64 start = QDateTime::currentDateTime().toMSecsSinceEpoch();
     modbus = new Modbus();
-    modbus->ModbusSetSerialPort(s->serial.name);
+    modbus->ModbusSetSerialPort(s->portName, s->dcb);
 
     QStringList dataList;
     dataList = ui->lE_Data_W->text().split(" ");
@@ -89,7 +91,7 @@ void MainWindow::on_pB_Send_R_clicked()
 
     qint64 start = QDateTime::currentDateTime().toMSecsSinceEpoch();
     modbus = new Modbus();
-    modbus->ModbusSetSerialPort(s->serial.name);
+    modbus->ModbusSetSerialPort(s->portName, s->dcb);
     if(modbus->ModbusRead(ui->lE_Slave_R->text().toInt(), ui->lE_Registor_R->text().toInt(), ui->lE_Data_R->text().toInt(), dest)==0)
     {
         qint64 end = QDateTime::currentDateTime().toMSecsSinceEpoch();
@@ -109,4 +111,11 @@ void MainWindow::on_pB_Send_R_clicked()
         qDebug()<<"读取失败";
     }
     delete modbus;
+}
+
+void MainWindow::on_actionUpdate_triggered()
+{
+    qDebug()<<"检查更新";
+    QProcess *process = new QProcess(this);
+    process->start("modbus.exe");
 }

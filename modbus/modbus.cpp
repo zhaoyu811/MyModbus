@@ -143,7 +143,7 @@ Modbus::~Modbus()
         CloseHandle(uart);
 }
 
-void Modbus::ModbusSetSerialPort(const QString &name)
+void Modbus::ModbusSetSerialPort(const QString &name, DCB dcb)
 {
     WCHAR wszClassName[20];
 
@@ -172,13 +172,13 @@ void Modbus::ModbusSetSerialPort(const QString &name)
         TimeOuts.WriteTotalTimeoutMultiplier = 5;
         TimeOuts.WriteTotalTimeoutConstant = 300;
         SetCommTimeouts(uart, &TimeOuts); //设置超时
-        DCB dcb;
-        GetCommState(uart, &dcb);
-        dcb.BaudRate = 9600; //波特率为9600
-        dcb.ByteSize = 8; //每个字节有8位
-        dcb.Parity = NOPARITY; //无奇偶校验位
-        dcb.StopBits = ONESTOPBIT; //1个停止位
-        SetCommState(uart, &dcb);
+        DCB tmp;
+        GetCommState(uart, &tmp);
+        tmp.BaudRate = dcb.BaudRate;
+        tmp.ByteSize = dcb.ByteSize;
+        dcb.Parity = dcb.Parity;
+        dcb.StopBits = dcb.StopBits;
+        SetCommState(uart, &tmp);
     }
 }
 

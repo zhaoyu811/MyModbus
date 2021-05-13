@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QSerialPort>
 #include <QSerialPortInfo>
+#include <windows.h>
 
 namespace Ui {
 class settings;
@@ -17,16 +18,10 @@ public:
     explicit settings(QWidget *parent = 0);
     ~settings();
 
-    struct Serial
-    {
-        QString name;
-        int  baudRate;
-        int  dataBits;
-        char parity;
-        int  stopBits;
-    };
+    DCB dcb;
+    QString portName;
 
-    Serial serial;
+    void UpdateSerialPort(void);
 
 private slots:
     void on_pB_Aplly_clicked();

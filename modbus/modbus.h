@@ -11,7 +11,7 @@ public:
     Modbus(const QString &name);
     ~Modbus();
 
-    void ModbusSetSerialPort(const QString &name);
+    void ModbusSetSerialPort(const QString &name, DCB dcb);
     int ModbusRead(int slaveid, int reg, int num, unsigned short *dest);
     int ModbusWrite(int slaveid, int reg, int val);
     int ModbusWriteRegisters(int slaveid, int reg, int num, unsigned short *data);

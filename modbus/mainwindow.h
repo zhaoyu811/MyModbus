@@ -24,6 +24,8 @@ private slots:
 
     void on_pB_Send_R_clicked();
 
+    void on_actionUpdate_triggered();
+
 private:
     Ui::MainWindow *ui;
     settings *s;

@@ -39,7 +39,7 @@ FORMS += \
     settings.ui
 
 #RC_FILE = logo.rc
-RC_ICONS = favicon.ico
+RC_ICONS = 20190729055658223_easyicon_net_128.ico
 
 RESOURCES += \
     resource.qrc
